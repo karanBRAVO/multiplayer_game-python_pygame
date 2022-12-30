@@ -15,6 +15,7 @@ PORT = 5689
 ADDR = (IP, PORT)
 FORMAT = "utf-8"
 DISCONNECT_MESSAGE = "...left"
+REFUSED_MESSAGE = "[REFUSED] server refused to join"
 windowWidth = 300
 windowHeight = windowWidth
 FPS = 60
@@ -90,12 +91,23 @@ def sendData(x, y, color):
 
 
 def recvData():
-    global other_player, RMV_PLAYER
+    global other_player, RMV_PLAYER, BREAK_MSG
     while True:
         DATA = CLIENT_SOCKET.recv(1024)
         if DATA:
             MESSAGE = DATA.decode(FORMAT)
-            print(Fore.GREEN + f"[RECEIVED]: {MESSAGE}")
+            if MESSAGE != "[SERVER] two users have already joined":
+                print(Fore.GREEN + f"[RECEIVED]: {MESSAGE}")
+            elif MESSAGE == "[SERVER] two users have already joined":
+                print(Fore.BLACK + Style.BRIGHT + Back.RED + f"[RECEIVED]: {MESSAGE}")
+                try:
+                    CLIENT_SOCKET.send(REFUSED_MESSAGE.encode(FORMAT))
+                    RMV_PLAYER = True
+                    BREAK_MSG = True
+                    CLIENT_SOCKET.close()
+                    print(Fore.MAGENTA + " --closed the socket")
+                except socket.error:
+                    print(Fore.RED + "no connection is running")
             if MESSAGE == "--user left":
                 RMV_PLAYER = True
             try:
@@ -114,9 +126,9 @@ def connectTOserver(address):
     try:
         CLIENT_SOCKET.connect(address)
         print(Fore.BLACK + Back.GREEN + "[CONNECTED] connected to server :)")
+        start_new_thread(recvData, ())
         MESSAGE = "--user joined"
         CLIENT_SOCKET.send(MESSAGE.encode(FORMAT))
-        start_new_thread(recvData, ())
     except socket.error:
         print(Fore.BLACK + Back.RED + "[!NOT FOUND] cannot connect :(")
 
