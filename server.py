@@ -26,7 +26,9 @@ def handleClientData(conn, addr, conn_list):
             CLIENT_MESSAGE = CLIENT_DATA.decode(FORMAT)
             print(Fore.GREEN + f"[RECEIVED] {addr[1]}: {CLIENT_MESSAGE}")
             if CLIENT_MESSAGE != "--user joined":
-                OBJ_LIST.append(CLIENT_MESSAGE)
+                TUP = (addr[1], CLIENT_MESSAGE)
+                OBJ_LIST.append(TUP)
+                print(OBJ_LIST)
             if len(conn_list) > 1:
                 for i in range(0, len(conn_list)):
                     if conn_list[i] != conn:
@@ -50,7 +52,7 @@ def handleClientData(conn, addr, conn_list):
 
 
 def startServer():
-    SOCKET.listen()
+    SOCKET.listen(2)
     print(Fore.YELLOW + Style.BRIGHT + f"[LISTENING] (on port {PORT}) server is listening  ...")
 
     while True:

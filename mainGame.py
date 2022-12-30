@@ -26,6 +26,7 @@ AVAILABLE_COLORS = ["GREEN", "RED", "BLUE"]
 BREAK_MSG = False
 PLAYER_WIDTH = 20
 PLAYER_HEIGHT = PLAYER_WIDTH
+RMV_PLAYER = False
 
 window = pygame.display.set_mode((windowWidth, windowHeight))
 pygame.display.set_caption("MULTIPLAYER-GAME")
@@ -86,12 +87,14 @@ def sendData(x, y, color):
 
 
 def recvData():
-    global other_player
+    global other_player, RMV_PLAYER
     while True:
         DATA = CLIENT_SOCKET.recv(1024)
         if DATA:
             MESSAGE = DATA.decode(FORMAT)
             print(Fore.GREEN + f"[RECEIVED]: {MESSAGE}")
+            if MESSAGE == "--user left":
+                RMV_PLAYER = True
             try:
                 other_player_x_pos = int(MESSAGE[MESSAGE.index("x_pos: ") + 7: MESSAGE.index(",")])
                 other_player_y_pos = int(MESSAGE[MESSAGE.index("y_pos: ") + 7: MESSAGE.index(", c")])
@@ -132,7 +135,12 @@ def mainLoop():
             print(Fore.BLACK + Back.RED + "(!)Not a Color")
     run = True
     main_player = Player(window, 50, 10, PLAYER_WIDTH, PLAYER_HEIGHT, COLOR.upper(), 100)
-    sendData(main_player.x, main_player.y, main_player.color)
+
+    try:
+        sendData(main_player.x, main_player.y, main_player.color)
+    except socket.error:
+        print(Fore.RED + "(!)Not connected to any server")
+
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -142,7 +150,8 @@ def mainLoop():
                     run = False
         window.fill(WHITE)
         main_player.moveRect()
-        other_player.drawRect()
+        if not RMV_PLAYER:
+            other_player.drawRect()
         pygame.display.update()
         clock.tick(FPS)
     pygame.quit()
