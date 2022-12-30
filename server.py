@@ -25,7 +25,7 @@ def handleClientData(conn, addr, conn_list):
         if CLIENT_DATA:
             CLIENT_MESSAGE = CLIENT_DATA.decode(FORMAT)
             print(Fore.GREEN + f"[RECEIVED] {addr[1]}: {CLIENT_MESSAGE}")
-            if CLIENT_MESSAGE != "--user joined":
+            if CLIENT_MESSAGE != "--user joined" and CLIENT_MESSAGE != DISCONNECT_MESSAGE:
                 TUP = (addr[1], CLIENT_MESSAGE)
                 OBJ_LIST.append(TUP)
                 print(OBJ_LIST)

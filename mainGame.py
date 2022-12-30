@@ -3,6 +3,7 @@ import socket
 from _thread import *
 import colorama
 from colorama import Fore, Back, Style
+import random
 
 pygame.init()
 colorama.init(autoreset=True)
@@ -26,6 +27,8 @@ AVAILABLE_COLORS = ["GREEN", "RED", "BLUE"]
 BREAK_MSG = False
 PLAYER_WIDTH = 20
 PLAYER_HEIGHT = PLAYER_WIDTH
+PLAYER_X = random.randint(0, windowWidth - PLAYER_WIDTH)
+PLAYER_Y = random.randint(0, windowHeight - PLAYER_HEIGHT)
 RMV_PLAYER = False
 
 window = pygame.display.set_mode((windowWidth, windowHeight))
@@ -134,7 +137,7 @@ def mainLoop():
         if not IS_COLOR:
             print(Fore.BLACK + Back.RED + "(!)Not a Color")
     run = True
-    main_player = Player(window, 50, 10, PLAYER_WIDTH, PLAYER_HEIGHT, COLOR.upper(), 100)
+    main_player = Player(window, PLAYER_X, PLAYER_Y, PLAYER_WIDTH, PLAYER_HEIGHT, COLOR.upper(), 100)
 
     try:
         sendData(main_player.x, main_player.y, main_player.color)
