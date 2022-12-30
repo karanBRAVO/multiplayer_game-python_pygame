@@ -166,7 +166,10 @@ def mainLoop():
         window.fill(WHITE)
         main_player.moveRect()
         if not RMV_PLAYER:
-            other_player.drawRect()
+            try:
+                other_player.drawRect()
+            except ValueError:
+                pass
         pygame.display.update()
         clock.tick(FPS)
     pygame.quit()
